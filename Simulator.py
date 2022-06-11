@@ -1,5 +1,8 @@
-from Programs import *
+from TDiags import *
 
+"""
+Constantes. Tokens de comandos y opciones del programa.
+"""
 TOKEN_DEFINIR = "DEFINIR"
 TOKEN_PROGRAMA = "PROGRAMA"
 TOKEN_INTERPRETE = "INTERPRETE"
@@ -7,8 +10,10 @@ TOKEN_TRADUCTOR = "TRADUCTOR"
 TOKEN_EJECUTABLE = "EJECUTABLE"
 TOKEN_SALIR = "SALIR"
 
+
 ejecutador : Ejecutor = Ejecutor()
 run : bool = True
+
 
 def simulator_usage():
     print("Uso:\n\tDEFINIR [TIPO] [ARGUMENTOS]")
@@ -84,18 +89,30 @@ while (run):
         print("Comando invalido.")
         simulator_usage()
 
-"""
-ejecutador.define_program("fibo", LOCAL_LANG)
-ejecutador.execute_program("fibo")
-ejecutador.define_program("factorial", "Java")
-ejecutador.execute_program("factorial")
-ejecutador.define_interpreter("c", "Java")
-ejecutador.execute_program("factorial")
-ejecutador.define_interpreter(LOCAL_LANG, "c")
-ejecutador.execute_program("factorial")
-ejecutador.define_program("holamundo", "Python3")
-ejecutador.define_traductor("wtf42", "Python3", LOCAL_LANG)
-ejecutador.execute_program("holamundo")
-ejecutador.define_traductor("c", "wtf42", "Java")
-ejecutador.execute_program("holamundo")
-"""
+print("Matando al programa!")
+print('                 uuuuuuu')
+print('             uu$$$$$$$$$$$uu')
+print('          uu$$$$$$$$$$$$$$$$$uu')
+print('         u$$$$$$$$$$$$$$$$$$$$$u')
+print('        u$$$$$$$$$$$$$$$$$$$$$$$u')
+print('       u$$$$$$$$$$$$$$$$$$$$$$$$$u')
+print('       u$$$$$$$$$$$$$$$$$$$$$$$$$u')
+print('       u$$$$$$"   "$$$"   "$$$$$$u')
+print('       "$$$$"      u$u       $$$$"')
+print('        $$$u       u$u       u$$$')
+print('        $$$u      u$$$u      u$$$')
+print('         "$$$$uu$$$   $$$uu$$$$"')
+print('          "$$$$$$$"   "$$$$$$$"')
+print('            u$$$$$$$u$$$$$$$u')
+print('             u$"$"$"$"$"$"$u')
+print('  uuu        $$u$ $ $ $ $u$$       uuu')
+print(' u$$$$        $$$$$u$u$u$$$       u$$$$')
+print('  $$$$$uu      "$$$$$$$$$"     uu$$$$$$')
+print('u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$')
+print('$$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"')
+print(' """      ""$$$$$$$$$$$uu ""$"""')
+print('           uuuu ""$$$$$$$$$$uuu')
+print('  u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$')
+print('  $$$$$$$$$$""""           ""$$$$$$$$$$$"')
+print('   "$$$$$"                      ""$$$$""')
+print('     $$$"                         $$$$"')

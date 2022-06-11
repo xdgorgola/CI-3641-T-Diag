@@ -2,9 +2,21 @@ from __future__ import annotations
 from operator import contains
 from typing import Dict, List, Set
 
+"""
+Constante. Indica el nombre del lenguaje local de una maquina.
+"""
 LOCAL_LANG : str = "LOCAL"
 
 class Ejecutor:
+    """
+    Se encarga de mantener la informacion de los programas, traductores einterpretes creados.
+
+    Tiene un grafo dirigido donde cada vertice representa un lenguaje y cada lado si es posible 
+    ejecutar ese lenguaje mediante otro (ya sea por una combinacion de traductores e interpretes).
+
+    La solucion se basa en que el problema de ejecutar programas de un lenguaje, puede convertirse en 
+    el problema de ejecutar un programa en otro lenguaje mediante cadenas de traductores e interpretes.
+    """
 
     def __init__(self : Ejecutor) -> None:
         self.languages : Dict[str, NodoLenguaje] = {LOCAL_LANG : NodoLenguaje(LOCAL_LANG)}
@@ -18,10 +30,32 @@ class Ejecutor:
 
     
     def can_be_executed(self : Ejecutor, lang : str) -> bool:
+        """
+        Indica si los programas de un lenguaje pueden ser ejecutados.
+
+        Argumentos:
+            lang -- Lenguaje a ver si es posible su ejecucion
+
+        Returns:
+            True si programas escritos en el lenguaje pueden ser ejecutados.
+            False en caso contrario o si el lenguaje no existe en las tablas.
+        """
+
         return contains(self.languages, lang) and self.wayToLocal[lang]
     
 
     def apply_interp(self : Ejecutor, interp : Interprete) -> bool:
+        """
+        Aplica los efectos de un interprete al grafo de lenguajes.
+
+        Argumentos:
+            interp -- Interprete a aplicar
+
+        Returns:
+            True si el interprete puede ser aplicado.
+            False si el interprete no puede ser ejecutado.
+        """
+
         if (not self.can_be_executed(interp.baseLanguage)):
             return False
         
@@ -30,6 +64,17 @@ class Ejecutor:
 
     
     def apply_trad(self : Ejecutor, trad : Traductor) -> bool:
+        """
+        Aplica los efectos de un traductor al grafo de lenguajes.
+
+        Argumentos:
+            interp -- traductor a aplicar
+
+        Returns:
+            True si el traductor puede ser aplicado.
+            False si el traductor no puede ser ejecutado.
+        """
+
         if (not self.can_be_executed(trad.baseLanguage)):
             return False
 
@@ -38,6 +83,11 @@ class Ejecutor:
 
 
     def update_lang_routes(self : Ejecutor) -> None:
+        """
+        Actualiza la lista de lenguajes que pueden ser ejecutados intentando
+        encontrar un camino hasta el lenguaje LOCAL desde cada lenguaje.
+        """
+
         for l in self.languages.keys():
             if (self.wayToLocal[l]):
                 continue
@@ -45,16 +95,23 @@ class Ejecutor:
             if (self.try_reaching_local(l)):
                 self.wayToLocal[l] = True
 
+
     def apply_int_trad(self : Ejecutor) -> None:
+        """
+        Intenta aplicar los interpretes y traductores que no han 
+        sido aplicados aun al grafo de lenguajes y actualiza la 
+        lista de lenguajes que pueden ejecutarse.
+        """
+
         remove : bool = False
         changed : bool = True
+        i : int = 0
         
         while (changed):
-            i : int = 0
+            i = 0
             changed = False
             while (i < len(self.toApply)):
                 p : ProgramaBase = self.toApply[i]
-                assert (not isinstance(p, Programa))
 
                 if (isinstance(p, Interprete)):
                     remove = self.apply_interp(p)
@@ -71,6 +128,17 @@ class Ejecutor:
     
 
     def try_reaching_local(self : Ejecutor, fromL : str) -> bool:
+        """
+        BFS que parte de un lenguaje e intenta encontrar un camino
+        hasta el lenguaje LOCAL
+
+        Argumentos:
+            fromL -- Lenguaje de partida
+
+        Returns:
+            True si se encontro un camino hasta LOCAL
+            Flase en otro caso
+        """
 
         # BFS DE LA MUERTE. SEGURO EXPLOTA     
         visited : Set[str] = set({})
@@ -90,7 +158,22 @@ class Ejecutor:
 
         return False
 
+
     def define_interpreter(self : Ejecutor, base : str, target : str) -> bool:
+        """
+        Crea un interprete, agrega las entradas necesarias a las 
+        tablas e intenta aplicar los interpretes/traductores de la 
+        lista de por aplicar.
+
+        Argumentos:
+            base -- Lenguaje en el que esta escrito
+            target -- Lenguaje que se interpreta
+
+        Returns:
+            True si el interprete no existe y fue creado
+            False si el interprete ya existe
+        """
+
         if (not contains(self.languages, base)):
             self.languages[base] = NodoLenguaje(base)
             self.wayToLocal[base] = False
@@ -117,6 +200,21 @@ class Ejecutor:
 
     
     def define_traductor(self : Ejecutor, base : str, fromL : str, toL :str) -> bool:
+        """
+        Crea un traductor, agrega las entradas necesarias a las 
+        tablas e intenta aplicar los interpretes/traductores de la 
+        lista de por aplicar.
+
+        Argumentos:
+            base -- Lenguaje en el que esta escrito
+            fromL -- Lenguaje desde el que se traduce
+            toL -- Lenguaje al que se traduce
+
+        Returns:
+            True si el traductor no existe y fue creado
+            False si el traductor ya existe
+        """
+
         if (not contains(self.languages, base)):
             self.languages[base] = NodoLenguaje(base)
             self.wayToLocal[base] = False
@@ -147,6 +245,19 @@ class Ejecutor:
     
     
     def define_program(self : Ejecutor, name : str, base : str) -> bool:
+        """
+        Crea un programa, agrega las entradas necesarias a las 
+        tablas.
+
+        Argumentos:
+            name -- Nombre del programa
+            base -- Lenguaje en el que esta escrito
+
+        Returns:
+            True si el programa no existe y fue creado
+            False si el programa ya existe
+        """
+
         if (not contains(self.languages, base)):
             self.languages[base] = NodoLenguaje(base)
             self.wayToLocal[base] = False
@@ -160,7 +271,19 @@ class Ejecutor:
         print("Creado el programa %s escrito en %s."%(name, base))
         return True
     
+
     def execute_program(self : Ejecutor, program : str) -> bool:
+        """
+        Intenta ejecutar un programa
+
+        Argumentos:
+            program -- Nombre del programa
+
+        Returns:
+            True si se puede ejecutar el programa
+            False si no se puede
+        """
+
         if (not contains(self.programs, program)):
             print("El programa %s no existe. Revise el case del programa."%(program))
             return False
@@ -170,11 +293,14 @@ class Ejecutor:
             print("El programa es ejecutado con exito!")
             return True
         
-        print("El programa no puede ser ejecutado con exito! Ha escapado.")
+        print("El programa no puede ser ejecutado con exito..")
         return False
 
 
 class NodoLenguaje:
+    """
+    vertice de un grafo dirigido que representa un lenguaje.
+    """
 
     def __init__(self : NodoLenguaje, language : str) -> None:
         self.language : str = language
@@ -182,6 +308,13 @@ class NodoLenguaje:
 
 
     def add_neighboor(self : NodoLenguaje, neighboor : NodoLenguaje) -> None:
+        """
+        Agrega un lado hacia otro vertice
+
+        Argumentos:
+            neighboor -- Nuevo vertice adyacente
+        """
+
         if (neighboor in self.adj):
             return
 
@@ -189,12 +322,18 @@ class NodoLenguaje:
     
 
 class ProgramaBase:
+    """
+    Clase abstracta base que representa un programa escrito en un lenguaje
+    """
 
     def __init__(self : ProgramaBase, baseLanguage : str) -> None:
         self.baseLanguage = baseLanguage
 
 
 class Programa(ProgramaBase):
+    """
+    Programa con un nombre y un lenguaje en el que fue escrito.
+    """
 
     def __init__(self : Programa, baseLanguage : str, name : str) -> None:
         super().__init__(baseLanguage)
@@ -202,6 +341,9 @@ class Programa(ProgramaBase):
 
 
 class Interprete(ProgramaBase):
+    """
+    Interprete de un lenguaje escrito en otro
+    """
 
     def __init__(self : Interprete, baseLanguage : str, targetLanguage :str) -> None:
         super().__init__(baseLanguage)
@@ -209,6 +351,9 @@ class Interprete(ProgramaBase):
 
 
 class Traductor(ProgramaBase):
+    """
+    Traductor de un lenguaje a otro escrito en algun lenguaje
+    """
 
     def __init__(self : Traductor, baseLanguage : str, fromLanguage : str, toLanguage :str) -> None:
         super().__init__(baseLanguage)
